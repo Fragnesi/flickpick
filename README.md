@@ -12,7 +12,7 @@ A CLI movie recommendation system that tracks your ratings and gives personalize
 ## Installation
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/flickpick.git
+git clone https://github.com/Fragnesi/flickpick.git
 cd flickpick
 pip install -e .
 ```
