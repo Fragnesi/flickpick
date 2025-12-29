@@ -95,14 +95,17 @@ async def get_mood_recommendations(
 
 
 def check_ollama_available(model: str = DEFAULT_MODEL) -> tuple[bool, str]:
-    """Check if Ollama is available and model is pulled.
-    
-    Returns (available, message).
-    """
+    """Check if Ollama is available and model is pulled."""
     try:
-        # Check if ollama is running
-        models = ollama.list()
-        model_names = [m["name"].split(":")[0] for m in models.get("models", [])]
+        result = ollama.list()
+        model_names: list[str] = []
+        if hasattr(result, "models") and result.models:
+            for m in result.models:
+                if m.model:
+                    model_names.append(m.model.split(":")[0])
+        elif isinstance(result, dict):
+            for m in result.get("models", []):
+                model_names.append(m["name"].split(":")[0])
         
         if model.split(":")[0] not in model_names:
             return False, f"Model '{model}' not found. Run: ollama pull {model}"
