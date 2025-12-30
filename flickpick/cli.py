@@ -278,7 +278,14 @@ def like_movies(
             if not source_movies:
                 return None, []
             
-            candidates = await client.get_popular()
+            candidates = []
+            seen_ids = set()
+            for movie in source_movies:
+                similar = await client.get_similar(movie["tmdb_id"])
+                for m in similar:
+                    if m["tmdb_id"] not in seen_ids:
+                        seen_ids.add(m["tmdb_id"])
+                        candidates.append(m)
             
             return source_movies, candidates
         finally:

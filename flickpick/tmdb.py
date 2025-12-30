@@ -101,6 +101,25 @@ class TMDbClient:
             for movie in data.get("results", [])
         ]
 
+    async def get_similar(self, tmdb_id: int) -> list[dict[str, Any]]:
+        genres = await self._ensure_genres()
+        response = await self._client.get(f"/movie/{tmdb_id}/similar")
+        response.raise_for_status()
+        data = response.json()
+        
+        return [
+            {
+                "tmdb_id": movie["id"],
+                "title": movie["title"],
+                "year": _parse_year(movie.get("release_date")),
+                "genres": [genres.get(gid, "Unknown") for gid in movie.get("genre_ids", [])],
+                "plot": movie.get("overview"),
+                "poster_url": f"{IMAGE_BASE_URL}{movie['poster_path']}" if movie.get("poster_path") else None,
+                "rating": movie.get("vote_average"),
+            }
+            for movie in data.get("results", [])
+        ]
+
     async def discover(
         self,
         genres: list[int] | None = None,
